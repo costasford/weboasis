@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://costasford.github.io/weboasis/sitemap.xml
