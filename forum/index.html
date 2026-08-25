@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>WebOas.is - Forum</title>
+		<link rel="icon" type="image/png" href="/favicon/favicon-32x32.png" sizes="32x32" />
+		<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,600" rel="stylesheet">
+		<style>
+			* { box-sizing: border-box; }
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family: 'Roboto', sans-serif;
+				background: #1a1d23;
+				color: #e8e8e8;
+			}
+			a { color: #4fc3f7; text-decoration: none; }
+			a:hover { text-decoration: underline; }
+			header {
+				padding: 16px 24px;
+				border-bottom: 1px solid #2c2f36;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+			header .title { font-size: 20px; font-weight: 500; }
+			header .name-field {
+				font-size: 13px;
+				color: #8a8f98;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			header .name-field input {
+				background: #22252c;
+				border: 1px solid #383c45;
+				border-radius: 4px;
+				color: #e8e8e8;
+				padding: 5px 8px;
+				font-size: 13px;
+				width: 130px;
+			}
+			main {
+				max-width: 720px;
+				margin: 0 auto;
+				padding: 32px 20px 60px;
+			}
+			.notice {
+				background: #22252c;
+				border: 1px solid #383c45;
+				border-radius: 6px;
+				padding: 12px 16px;
+				font-size: 13px;
+				color: #8a8f98;
+				margin-bottom: 24px;
+			}
+			.view { display: none; }
+			.view.active { display: block; }
+
+			/* list view */
+			.list-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 18px;
+			}
+			.list-head h1 { font-size: 20px; font-weight: 500; margin: 0; }
+			button.primary {
+				padding: 10px 18px;
+				font-size: 14px;
+				background: #0b89c3;
+				border: none;
+				border-radius: 6px;
+				color: #fff;
+				cursor: pointer;
+			}
+			button.primary:hover { background: #0d9fe0; }
+			button.secondary {
+				padding: 9px 16px;
+				font-size: 14px;
+				background: #22252c;
+				border: 1px solid #383c45;
+				border-radius: 6px;
+				color: #e8e8e8;
+				cursor: pointer;
+			}
+			button.secondary:hover { background: #2a2e36; }
+			.thread-card {
+				display: block;
+				background: #22252c;
+				border: 1px solid #2c2f36;
+				border-radius: 8px;
+				padding: 16px 18px;
+				margin-bottom: 12px;
+				cursor: pointer;
+			}
+			.thread-card:hover { border-color: #383c45; text-decoration: none; }
+			.thread-card h3 { margin: 0 0 6px; font-size: 16px; font-weight: 500; color: #e8e8e8; }
+			.thread-card .meta { font-size: 12px; color: #8a8f98; }
+			.empty { color: #8a8f98; padding: 30px 0; text-align: center; }
+
+			/* new thread form / thread view shared */
+			.field { margin-bottom: 16px; }
+			.field label { display: block; font-size: 13px; color: #8a8f98; margin-bottom: 6px; }
+			.field input[type=text], .field textarea {
+				width: 100%;
+				padding: 10px 12px;
+				font-size: 14px;
+				background: #22252c;
+				border: 1px solid #383c45;
+				border-radius: 6px;
+				color: #e8e8e8;
+				font-family: inherit;
+				resize: vertical;
+			}
+			.field textarea { min-height: 110px; }
+			.field input:focus, .field textarea:focus { outline: none; border-color: #0b89c3; }
+			.form-actions { display: flex; gap: 10px; }
+
+			/* thread view */
+			.back-link { display: inline-block; margin-bottom: 18px; font-size: 14px; }
+			.post {
+				background: #22252c;
+				border: 1px solid #2c2f36;
+				border-radius: 8px;
+				padding: 16px 18px;
+				margin-bottom: 14px;
+			}
+			.post .meta { font-size: 12px; color: #8a8f98; margin-bottom: 10px; }
+			.post .body { white-space: pre-wrap; line-height: 1.5; font-size: 14px; }
+			.reply-count { font-size: 13px; color: #8a8f98; margin: 22px 0 10px; }
+		</style>
+	</head>
+	<body>
+		<header>
+			<div class="title"><a href="/">WebOasis</a> / Forum</div>
+			<div class="name-field">
+				Posting as
+				<input type="text" id="name-input" placeholder="Anonymous" maxlength="30">
+			</div>
+		</header>
+		<main>
+			<div class="notice">This is a simple placeholder forum stored in your own browser (nothing here is shared between visitors yet) — a real shared version is planned once the site gets a proper backend.</div>
+
+			<section id="view-list" class="view active">
+				<div class="list-head">
+					<h1>Threads</h1>
+					<button class="primary" id="new-thread-btn">New Thread</button>
+				</div>
+				<div id="thread-list"></div>
+			</section>
+
+			<section id="view-new" class="view">
+				<a class="back-link" href="#" id="cancel-new">&larr; Back to threads</a>
+				<div class="field">
+					<label for="new-title">Title</label>
+					<input type="text" id="new-title" maxlength="120" placeholder="What's this about?">
+				</div>
+				<div class="field">
+					<label for="new-body">Message</label>
+					<textarea id="new-body" placeholder="Write something..."></textarea>
+				</div>
+				<div class="form-actions">
+					<button class="primary" id="post-thread-btn">Post Thread</button>
+					<button class="secondary" id="cancel-new-2">Cancel</button>
+				</div>
+			</section>
+
+			<section id="view-thread" class="view">
+				<a class="back-link" href="#" id="back-to-list">&larr; Back to threads</a>
+				<div id="thread-content"></div>
+				<div class="reply-count" id="reply-count"></div>
+				<div id="reply-list"></div>
+				<div class="field">
+					<label for="reply-body">Reply</label>
+					<textarea id="reply-body" placeholder="Write a reply..."></textarea>
+				</div>
+				<div class="form-actions">
+					<button class="primary" id="post-reply-btn">Post Reply</button>
+				</div>
+			</section>
+		</main>
+		<script src="app.js"></script>
+	</body>
+</html>
