@@ -2,3 +2,8 @@ Thumbs.db
 desktop.ini
 .DS_Store
 .claude/
+
+# Local-only build source dumps for a few features (forum theme/addons,
+# ipfs/qr/newsfeed source snapshots) - not referenced by the deployed
+# site, kept locally for reference only.
+themes-plugins-source/

@@ -60,4 +60,4 @@ This started as someone else's project. The original author passed away and made
 
 ## License
 
-Not yet decided — treat it as source-available for now. If you want to actually use or fork parts of this, open an issue and ask.
+[MIT](LICENSE).
