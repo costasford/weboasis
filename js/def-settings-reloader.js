@@ -71,6 +71,12 @@ DEF_SETTINGS_RELOADER._setDefaultSettings = function(){
 	localStorage.setItem(DEF_SETTINGS_RELOADER._settings._menuVersionID, MENU_VERSION+"");
 	DEF_SETTINGS_RELOADER._setLastUpdatedAt();
 	buildMenu();
+	// custom-items-menu.js renders the "Custom Links" drawer from the same
+	// localStorage key on load, before this reloader runs - refresh it too,
+	// or it keeps showing whatever was cached at page-load time.
+	if(typeof buildCustomUserLinksMenu === "function"){
+		buildCustomUserLinksMenu();
+	}
 	//-Handling the menu settings
 }
 

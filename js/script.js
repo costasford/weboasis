@@ -43,19 +43,19 @@ let linkMenuOrder = [
   "Cloud",
   "More",
 ];
-let MENU_VERSION = 5;
+let MENU_VERSION = 6;
 let defaultLinkMenu = {
   "Downloads": [
     [svgDownloads,                   "blue",                                        "-HEAD-"],
-    ["OasisMagnet",                   "/magnet/magnet/","Magnet Search"],
+    ["OasisMagnet",                   "magnet/magnet/","Magnet Search"],
     ["UnblockIt",                   "https://unblockit.tv","Bypass Blocks"],
     ["ConCen",             "https://www.concen.org/browse","EDU Torrent"],
     ["Academic",                   "https://academictorrents.com","EDU Torrent"],
     ["Etree",                   "https://etree.org","Music Torrent"],
     ["WebTor",                   "https://webtor.io","Browser Client"],
     ["BatchEdit",                   "https://yutzuko-torrent.appspot.com","Torrent Editor"],
-    ["TorMagnet",                   "/torrent/t2m/","Torrent Converter"],
-    ["TorCreate",                   "/torrent/make/","Torrent Creator"],
+    ["TorMagnet",                   "torrent/t2m/","Torrent Converter"],
+    ["TorCreate",                   "torrent/make/","Torrent Creator"],
     ["FossHub",                    "https://www.fosshub.com","Freeware"],
     ["AppImage",                   "https://www.appimagehub.com","Linux Freeware"],
     ["OlderGeek",               "https://oldergeeks.com","Win Freeware"],
@@ -510,9 +510,9 @@ let defaultLinkMenu = {
   ],
   "Cloud": [
     [svgCloud,                    "yellow",                                      "-HEAD-"],
-    ["OasisUpload",                  "/upload/","Upload Files"],
-    ["OasisImage",                  "/ipfs/","Upload Images"],
-    ["OasisEditor",                  "/editors/","Image Editors"],
+    ["OasisUpload",                  "upload/","Upload Files"],
+    ["OasisImage",                  "ipfs/","Upload Images"],
+    ["OasisEditor",                  "editors/","Image Editors"],
     ["Melobytes",                  "https://melobytes.com","Media AI"],
     ["GifRun",                  "https://gifrun.com","Video Gifs"],
     ["EZGif",                  "https://ezgif.com","Video Gifs"],
@@ -652,7 +652,7 @@ let defaultLinkMenu = {
     ["CFSpeed",               "https://speed.cloudflare.com","Internet Speed"],
     ["SpeedTest",               "https://www.speedtest.net","Internet Speed"],
     ["LibreSpeed",               "https://librespeed.org","Internet Speed"],
-    ["HostGuide",               "/media/host.pdf","Hosting Guide"],
+    ["HostGuide",               "media/host.pdf","Hosting Guide"],
     ["ServerHunt",               "https://www.serverhunter.com","Host List"],
     ["ExoticVM",               "https://www.exoticvm.com","Host List"],
     ["Products",                   "https://www.producthunt.com","New Sites"],
