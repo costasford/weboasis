@@ -104,9 +104,6 @@ $(".getCurrentCity").on("click", function() {
   getLocation(); //get current location function
 });
 
-// google map api
-// document.write('<script src="https://maps.google.com/maps/api/js?v=3&key=AIzaSyAMODrdEnbRHQEMT6KsZ44NjevVN656AuE" type="text/javascript"></script>');
-
 // Dark Sky (api.darksky.net) was shut down permanently by Apple in March
 // 2023, so weather data now comes from Open-Meteo (open, keyless, still
 // live) via fetchWeather() below, which reshapes the response to match

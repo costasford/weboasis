@@ -1,0 +1,30 @@
+# Config for the weekly link-check workflow (.github/workflows/link-check.yml).
+# Docs: https://lychee.cli.rs/usage/config-file/
+
+# Don't check these paths at all.
+exclude_path = [
+    "themes-plugins-source",  # vendored source dumps, not live pages
+]
+
+# Skip these URL/scheme patterns entirely.
+exclude = [
+    "^mailto:",
+    "^javascript:",
+    "^http://localhost",
+    "^https://localhost",
+]
+
+# Some sites 403/429 automated clients regardless of link health (Reddit,
+# LinkedIn, Cloudflare-fronted sites, etc). Treat these as fine rather than
+# generating false-positive noise every week.
+accept = [200, 201, 202, 203, 204, 206, 301, 302, 303, 307, 308, 403, 429]
+
+# Look like a real browser — some sites block the default lychee UA outright.
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+
+timeout = 20
+retry_wait_time = 5
+max_retries = 2
+
+# Follow redirects when judging whether a link is alive.
+include_verbatim = false
