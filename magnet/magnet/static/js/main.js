@@ -145,7 +145,7 @@
         f = n(210),
         d = n.n(f),
         h = (n(378), []);
-      fetch("/magnet/magnet/trackers.txt")
+      fetch("/weboasis/magnet/magnet/trackers.txt")
         .then(function (e) {
           return e.text();
         })
