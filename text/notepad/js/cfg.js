@@ -1,1 +1,151 @@
-eval((function(p){for(var q="",r=0,s=function(p,t){for(var u=0,v=0;v<t;v++){u*=96;var w=p.charCodeAt(v);if(w>=32&&w<=127){u+=w-32;}}return u;};r<p.length;){if(p.charAt(r)!="`")q+=p.charAt(r++);else{if(p.charAt(r+1)!="`"){var x=s(p.charAt(r+3),1)+5;q+=q.substr(q.length-s(p.substr(r+1,2),2)-x,x);r+=4;}else{q+="`";r+=2;}}}return q;})("function saveTextAsFile(b,d){var a=navigator.userAgent.match(\/MSIE\\s([\\d.]+)\/),h` 27Trident\\\/7.0\/)&&` ^6rv:11\/),i`!\"7Edge\/g),f=a?a[1]:h?11:i?12:-1;if(a&&f<10)return void console.log(\"No blobs on IE ver<10\");var d=tinyMCE.activeEditor.getContent({format:\"text\"}),d=d.replace(\/\\r?\\n\/g,\"\\r\\n\"),g=new Blob([d],{type` U!\/plain\"}),b=$(\"#txt_name\").val()+\".txt\";if(f>-1)window.`$.%msSave` v g,b);else`$X e=document.createElement(\"a\");e.download=b,e.href=` u\"URL` K\"ObjectURL(g),e.onclick=`%p#(c){` {$body.removeChild(c.target);},e.style.display=\"none\",` O)append` W!e),e.`!) ();}}`\'!$read`& c,b`&~!d`#V FileReader;d.o`\"0#d.readAsText(c);}$(`\"l#)` 6 y(`\"#$){$(\"#file_input\").on(\"change\",`\"K$b){`!<$this.files[0]` 9%c){`%j0s`%u%`\"u#.result`%g.<br\/>\"));});});}`&s!config={};` #\"$.extend(` 4!,{resize:!1,oninit:\"setPlainText\",paste_as_text:!0,height:800,auto` Z!_min_` %0:!` B!save_interval:\"1s\"` -%restore_when_empty:!0,browser_spellcheck` _(ask_before_u`&t :!1,entity_encoding:\"raw`!|#data_images` F `\'Y!path:!1`!A\'tention:\"525600m\",menu:{file:{title:\"File\",items:\"new`(U# savefile load` $ print\"},edit` W$Edit` W$undo redo | cut copy `#u  | selectall` \' arch`%7\"\"},inser` k%I` * `!N$` 8!datetime | charmap nonbreaking\"},view`\"\/$View`\"\/$font`!9! preview fullscreen\"},help`\"i$Help`\"i$shortcuts | about\"}},setup:`(Z$a){a.addMenuItem(\"`#4#\",{con`&M \"` *!` &!Save\",icon:` G \",`! #:\"Ctrl+S\",onclick` }%){a.windowManager.open(`$a#Save As\",width:34`\'Z$90,onsubmit`!k%c){saveTextAs`*1 );},body:[{type:\"textbox\",id:\"txt_name\",label`%s!name:\"}],buttons:[{`\"5\'`!p.`!$+,`\"$+clos`!G }]});}}),`#M*`&g#`#D3Open...`#W#`)8!`#P,O`#L0$(\"#file_input\").`#~ `!I `!7,`%H!,`\"J\"Homepag`$n#!1`$L\/`$X!.location.href=\"\/\"`\"3\/`&P$` z$S` (%` RMkeyboard-`\'H$.html`!0&B`$^ `#S(`#4)`*J\"`#W$`\"nMon(\"init\",`\'H(add`\"4#(\"meta+o\",\"` 8(`#5`%Y\"` R*b` \\ \"\"` (1i` z ` &3u` ?8s`!K+`(R~`(R~`)(H`#r tinymce.Plugin`)w#add(`)J saver`$~&b,d){b`&=\'` >#\",`#\"\'`)p#` 4!`)Q.b`\"m~`\"m~`#c(`\"$+`#a*`#m\"}),navigator.userAgent.search(\/webkit\/i)>0?config.forced_root_block=\"div\":` &4!1,` T\"toolbar=[\"newdocument loadfile `${# print | cut copy paste | undo redo | `!]!replace  | fontselect` %!ize` (\"| fullscreen\"]`!F#p`&@ s=[\"autoresiz`!3#` n)` S% auto`!]!`!M insertdatetime charmap nonbreaking` Q\'`\':$ wordcount `!E%`!u!or=\"#editor\"`#\/#content_css=[\"css\/app.css\"]`(M MCE.init(`$<!)"));
+function saveTextAsFile(filename) {
+	var ieMatch = navigator.userAgent.match(/MSIE\s([\d.]+)/),
+		isIE11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/),
+		isEdge = navigator.userAgent.match(/Edge/g),
+		ieVersion = ieMatch ? ieMatch[1] : isIE11 ? 11 : isEdge ? 12 : -1;
+	if (ieMatch && ieVersion < 10) return void console.log("No blobs on IE ver<10");
+	var content = tinyMCE.activeEditor.getContent({ format: "text" });
+	content = content.replace(/\r?\n/g, "\r\n");
+	var blob = new Blob([content], { type: "text/plain" });
+	var name = $("#txt_name").val() + ".txt";
+	if (ieVersion > -1) {
+		window.navigator.msSaveBlob(blob, name);
+	} else {
+		var link = document.createElement("a");
+		link.download = name;
+		link.href = window.URL.createObjectURL(blob);
+		link.onclick = function (e) {
+			document.body.removeChild(e.target);
+		};
+		link.style.display = "none";
+		document.body.appendChild(link);
+		link.click();
+	}
+}
+
+function readFile(file, onload) {
+	var reader = new FileReader();
+	reader.onload = onload;
+	reader.readAsText(file);
+}
+
+$(document).ready(function () {
+	$("#file_input").on("change", function (e) {
+		readFile(this.files[0], function (loaded) {
+			tinyMCE.activeEditor.setContent(loaded.target.result.replace(/\r?\n/g, "<br/>"));
+		});
+	});
+});
+
+function openSaveAsDialog(editor) {
+	editor.windowManager.open({
+		title: "Save As",
+		width: 340,
+		height: 90,
+		onsubmit: function () {
+			saveTextAsFile();
+		},
+		body: [{ type: "textbox", id: "txt_name", label: "Filename:" }],
+		buttons: [
+			{
+				text: "Save",
+				onclick: function () {
+					saveTextAsFile();
+					editor.windowManager.close();
+				},
+			},
+		],
+	});
+}
+
+var config = {};
+config = $.extend(config, {
+	resize: false,
+	oninit: "setPlainText",
+	paste_as_text: true,
+	height: 800,
+	autoresize_min_height: 800,
+	autoresize: true,
+	autosave_interval: "1s",
+	autosave_restore_when_empty: true,
+	browser_spellcheck: true,
+	autosave_ask_before_unload: false,
+	entity_encoding: "raw",
+	paste_data_images: false,
+	elementpath: false,
+	autosave_retention: "525600m",
+	menu: {
+		file: { title: "File", items: "newdocument savefile loadfile print" },
+		edit: { title: "Edit", items: "undo redo | cut copy paste | selectall | searchreplace" },
+		insert: { title: "Insert", items: "insertdatetime | charmap nonbreaking" },
+		view: { title: "View", items: "fontselect preview fullscreen" },
+		help: { title: "Help", items: "shortcuts | about" },
+	},
+	setup: function (editor) {
+		editor.addMenuItem("savefile", {
+			context: "file",
+			text: "Save",
+			icon: "save",
+			shortcut: "Ctrl+S",
+			onclick: function () {
+				openSaveAsDialog(editor);
+			},
+		});
+		editor.addMenuItem("loadfile", {
+			context: "file",
+			text: "Open...",
+			icon: "browse",
+			shortcut: "Ctrl+O",
+			onclick: function () {
+				$("#file_input").click();
+			},
+		});
+		editor.addMenuItem("about", {
+			text: "Homepage",
+			icon: false,
+			onclick: function () {
+				window.location.href = "../../";
+			},
+		});
+		editor.addMenuItem("shortcuts", {
+			text: "Shortcuts",
+			icon: false,
+			onclick: function () {
+				window.location.href = "keyboard-shortcuts.html";
+			},
+		});
+		editor.addButton("loadfile", {
+			icon: "browse",
+			title: "Open...",
+			onclick: function () {
+				$("#file_input").click();
+			},
+		});
+		editor.on("init", function () {
+			editor.addShortcut("meta+o", "", function () {
+				$("#file_input").click();
+			});
+			editor.addShortcut("meta+b", "", "");
+			editor.addShortcut("meta+i", "", "");
+			editor.addShortcut("meta+u", "", "");
+			editor.addShortcut("meta+s", "", function () {
+				openSaveAsDialog(editor);
+			});
+		});
+		tinymce.PluginManager.add("filesaver", function (editor) {
+			editor.addButton("filesave", {
+				title: "Save",
+				icon: "save",
+				onclick: function () {
+					openSaveAsDialog(editor);
+				},
+			});
+		});
+	},
+});
+config.forced_root_block = navigator.userAgent.search(/webkit/i) > 0 ? "div" : false;
+config.toolbar = ["newdocument loadfile filesave print | cut copy paste | undo redo | searchreplace  | fontselect fontsizeselect | fullscreen"];
+config.plugins = ["autoresize print searchreplace fullscreen autosave paste insertdatetime charmap nonbreaking fullscreen filesaver wordcount "];
+config.selector = "#editor";
+config.content_css = ["css/app.css"];
+tinyMCE.init(config);
