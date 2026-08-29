@@ -375,9 +375,9 @@
                 M.a,
                 { className: "mr-auto" },
                 r.a.createElement(
-                  M.a.Link,
+                  c.b,
                   {
-                    href: "/",
+                    to: "/",
                     style: { color: "white", textDecoration: "none" },
                   },
                   "Home"
