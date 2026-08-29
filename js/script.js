@@ -1269,22 +1269,25 @@ function addLinkToMenu(URL, name, menuID) {
   buildMenu();
 }
 
+let currentDeleteHandler = null;
+
 function confirmRemove() {
   let linkElement = this.parentNode;
   let label = this.parentNode.querySelector("label").innerHTML;
   confirmModal.style.display = "block";
   overlay.style.display = "block";
   document.getElementById("modal-label").innerHTML = label;
-  document.getElementById("deleteLink").addEventListener(
-    "click",
-    function () {
-      removeLinkFromMenu(linkElement);
-      confirmModal.style.display = "none";
-      overlay.style.display = "none";
-    }, {
-      once: true,
-    }
-  );
+  if (currentDeleteHandler) {
+    document.getElementById("deleteLink").removeEventListener("click", currentDeleteHandler);
+  }
+  currentDeleteHandler = function () {
+    removeLinkFromMenu(linkElement);
+    confirmModal.style.display = "none";
+    overlay.style.display = "none";
+  };
+  document.getElementById("deleteLink").addEventListener("click", currentDeleteHandler, {
+    once: true,
+  });
 }
 
 function removeLinkFromMenu(linkElement) {

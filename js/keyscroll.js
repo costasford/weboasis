@@ -122,7 +122,8 @@ function selectKey(e) {
       "#mainContainer2 .searchSources"
     );
 
-    var selected = allSearchedLinks[selectedIndex];
+    var selected = allSearchedLinks[selectedIndex >= 0 ? selectedIndex : 0];
+    if (!selected) return;
     if (selectedIndex >= 0) {
       selected.classList.add("selectedResult");
     }
@@ -136,15 +137,15 @@ function selectKey(e) {
     searchInput.value.length !== 0
   ) {
     // Enter AutoComplete, Right Side
+    if (selectedIndex < 0) return;
 
     let allSearchedLinks = document.querySelectorAll(
       "#generatedList .searchSources"
     );
 
     var selected = allSearchedLinks[selectedIndex];
-    if (selectedIndex >= 0) {
-      selected.classList.add("selectedResult");
-    }
+    if (!selected) return;
+    selected.classList.add("selectedResult");
     searchInput.value = selected.innerText;
   } else if (
     e.keyCode == 38 ||

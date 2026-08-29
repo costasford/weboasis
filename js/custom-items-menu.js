@@ -101,15 +101,15 @@ function customLinkRemoveConfirmation(ev) {
   overlay.style.display = "block";
 
   document.getElementById("modal-label").innerHTML = label;
-  document.getElementById("deleteLink").addEventListener(
-    "click",
-    function() {
-      removeCustomLink(category, index);
-      confirmModal.style.display = "none";
-      overlay.style.display = "none";
-    },
-    { once: true }
-  );
+  if (currentDeleteHandler) {
+    document.getElementById("deleteLink").removeEventListener("click", currentDeleteHandler);
+  }
+  currentDeleteHandler = function() {
+    removeCustomLink(category, index);
+    confirmModal.style.display = "none";
+    overlay.style.display = "none";
+  };
+  document.getElementById("deleteLink").addEventListener("click", currentDeleteHandler, { once: true });
 }
 
 const perfectSrollBars = {

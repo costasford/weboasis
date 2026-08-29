@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
         url_str = "url(media/bg/bg" + t + ".jpg)";
         console.log(url_str);
         void 0 === t | !t ?
-            (document.getElementById("canvasContainer").style.display = "block", document.getElementById("body").style.display.backgroundImage = "none", document.getElementById("resetBackgroundBtn").style.display = "none") :
+            (document.getElementById("canvasContainer").style.display = "block", document.getElementById("body").style.backgroundImage = "none", document.getElementById("resetBackgroundBtn").style.display = "none") :
             (document.getElementById("canvasContainer").style.display = "none", document.getElementById("body").style.backgroundImage = url_str)
     }
 

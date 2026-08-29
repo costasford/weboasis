@@ -7,11 +7,15 @@ let AutoComp = [];
 async function fetchAutoComp(searchTerm) {
     AutoComp = [];
 
-    let res = await fetch(corsUrl + selectedUrl + searchTerm);
-    data = await res.json();
-    await data.map((item) => {
-        AutoComp.push(item.phrase);
-    });
+    try {
+        let res = await fetch(corsUrl + selectedUrl + searchTerm);
+        let data = await res.json();
+        data.forEach((item) => {
+            AutoComp.push(item.phrase);
+        });
+    } catch (e) {
+        console.log("Autocomplete suggestions unavailable:", e);
+    }
     selectedIndex = -1; //Resetting index for every fetching of new suggestions list
     buildHelp();
 }
