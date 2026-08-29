@@ -540,7 +540,7 @@
                   })
                   .splice(0, 250)
                   .map(function (e, r) {
-                    if (void 0 != e.pubDate)
+                    if (void 0 != e.pubDate && !isNaN(new Date(e.pubDate).getTime()))
                       return n.a.createElement(
                         b.a,
                         { key: r },
