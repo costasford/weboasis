@@ -949,17 +949,17 @@ function buildSystemInfo() {
   const realWidth = Math.round(window.screen.width * pixelRatio);
   const realHeight = Math.round(window.screen.height * pixelRatio);
   let binfo =
-    '<a href="https://amiunique.org/fp"  target="_blank"> ' +
+    '<a href="https://amiunique.org/fingerprint"  target="_blank"> ' +
     platform.os +
     "</a>" +
     "<br>" +
-    '<a href="https://amiunique.org/fp"  target="_blank"> ' +
+    '<a href="https://amiunique.org/fingerprint"  target="_blank"> ' +
     platform.name +
     " " +
     platform.version +
     "</a>" +
     "<br>" +
-    '<a href="https://amiunique.org/fp"  target="_blank"> ' +
+    '<a href="https://amiunique.org/fingerprint"  target="_blank"> ' +
     realWidth +
     " x " +
     realHeight +
@@ -972,7 +972,7 @@ function buildSystemInfo() {
     systemInfoDiv.innerHTML =
       binfo +
       "<br>" +
-      '<a href="https://amiunique.org/fp"  target="_blank"> ' +
+      '<a href="https://amiunique.org/fingerprint"  target="_blank"> ' +
       logical +
       "</a>" +
       "<br>" +
