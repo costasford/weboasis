@@ -19,10 +19,12 @@ let re = /#(.*)/;
 if (re.exec(window.location.href)) {
   var x = re.exec(window.location.href)[1];
   let element2 = document.getElementById(x);
-  element2.parentElement.previousElementSibling.scrollIntoView({
-    block: "start",
-  });
-  element2.parentElement.style.display = "block";
+  if (element2 && element2.parentElement) {
+    element2.parentElement.previousElementSibling.scrollIntoView({
+      block: "start",
+    });
+    element2.parentElement.style.display = "block";
+  }
 }
 
 //Expand Button
@@ -66,7 +68,7 @@ function copyLink(copyButton) {
   var faqId = copyButton.parentElement.parentElement.id;
   var dummy = document.createElement("textarea");
   document.body.appendChild(dummy);
-  dummy.value = "/faq/net/#" + faqId;
+  dummy.value = window.location.origin + window.location.pathname + "#" + faqId;
   dummy.select();
   document.execCommand("copy");
   document.body.removeChild(dummy);
