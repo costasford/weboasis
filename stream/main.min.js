@@ -82,10 +82,11 @@ function clear() {
     three = "";
 }
 function clickPress(event) {
+    clearTimeout(timeout);
     if (event.keyCode == 13) {
         search();
+        return;
     }
-    clearTimeout(timeout);
     timeout = setTimeout(function () {
         search();
     }, 300);
