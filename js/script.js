@@ -1241,14 +1241,12 @@ function buildMenu() {
 }
 
 function randomLink() {
-  let max_1 = linkMenuOrder.length;
-  let i = Math.round(Math.random() * max_1);
-  let menuID = linkMenuOrder[i];
-  let menuItems = linkMenu[menuID];
-  max_2 = menuItems.length;
-  let j = Math.round(Math.random() * max_2);
-  let randomLink = menuItems[j][1];
-  window.open(randomLink);
+  let menuID = linkMenuOrder[Math.floor(Math.random() * linkMenuOrder.length)];
+  let menuItems = linkMenu[menuID].filter(function (item) {
+    return item[2] !== "-HEAD-";
+  });
+  let target = menuItems[Math.floor(Math.random() * menuItems.length)];
+  window.open(target[1]);
 }
 document.getElementById("add").addEventListener("click", function () {
   setTimeout(function () {
@@ -1711,13 +1709,13 @@ function toggleSettings() {
 let settingsFile = null;
 
 function exportUserSettings(settings) {
-  let settingsFile = new Blob([JSON.stringify(settings, null, 2)], {
-    type: "application/json",
-  });
   if (settingsFile !== null) {
     window.URL.revokeObjectURL(settingsFile);
   }
-  settingsFile = window.URL.createObjectURL(settingsFile);
+  let blob = new Blob([JSON.stringify(settings, null, 2)], {
+    type: "application/json",
+  });
+  settingsFile = window.URL.createObjectURL(blob);
   console.log(settingsFile);
   return settingsFile;
 }

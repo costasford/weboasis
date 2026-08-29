@@ -23,6 +23,9 @@ jobs:
             --config .github/lychee.toml
             --no-progress
             './**/*.html'
+            'js/script.js'
+            'js/custom.js'
+            'weather/js/geoloWeather.js'
           output: ./lychee/out.md
           fail: false
 
