@@ -150,7 +150,7 @@
           return e.text();
         })
         .then(function (e) {
-          for (var t = e.split(","), n = 0; n <= 10; n++) h.push(t[n]);
+          for (var t = e.split(",").map(function (s) { return s.trim(); }).filter(Boolean), n = 0; n < t.length; n++) h.push(t[n]);
         })
         .catch(function () {
           console.log("Error Fetching Trackers.");
