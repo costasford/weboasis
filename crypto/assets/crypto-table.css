@@ -1,0 +1,125 @@
+#main-widget {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 12px 40px;
+  font-family: Tahoma, Geneva, sans-serif;
+  color: #eee;
+}
+
+.ct-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ct-search {
+  flex: 1 1 200px;
+  min-width: 140px;
+  padding: 8px 10px;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #eee;
+  font-size: 13px;
+}
+
+.ct-currency {
+  padding: 8px 10px;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #eee;
+  font-size: 13px;
+}
+
+.ct-status {
+  font-size: 12px;
+  color: #888;
+  margin-left: auto;
+}
+
+.ct-status.ct-error {
+  color: #ff6b6b;
+}
+
+.ct-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #222;
+  border-radius: 4px;
+}
+
+.ct-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.ct-table thead {
+  background: #0280cf;
+}
+
+.ct-th {
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  user-select: none;
+}
+
+.ct-th.ct-sort-active {
+  border-bottom: 2px solid #fff;
+}
+
+.ct-table tbody tr {
+  border-bottom: 1px solid #1c1c1c;
+  cursor: pointer;
+}
+
+.ct-table tbody tr:hover {
+  background: #151515;
+}
+
+.ct-table td {
+  padding: 9px 12px;
+}
+
+.ct-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ct-coin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ct-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.ct-symbol {
+  color: #888;
+  font-size: 11px;
+}
+
+.ct-up {
+  color: #3ecf6a;
+}
+
+.ct-down {
+  color: #ff5c5c;
+}
+
+@media screen and (max-width: 700px) {
+  .ct-table td:nth-child(5),
+  .ct-table th:nth-child(5) {
+    display: none;
+  }
+}
