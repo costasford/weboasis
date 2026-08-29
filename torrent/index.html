@@ -18,8 +18,9 @@
     <header>
       <h1>WebTorrent Client</h1>
       <div class="views" ng-show="$root.client.torrents.length == 0">
-        <a ng-href="#">Full</a> | <a ng-href="download">Single Download</a> |
-        <a ng-href="view">Stream / View</a>
+        <a href="" ng-click="$event.preventDefault(); goToPath('/')">Full</a> |
+        <a href="" ng-click="$event.preventDefault(); goToPath('/download')">Single Download</a> |
+        <a href="" ng-click="$event.preventDefault(); goToPath('/view')">Stream / View</a>
       </div>
       <div class="aligncenter" style="width: 468px; display: inline-block;"></div>
     </header>

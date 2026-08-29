@@ -41,11 +41,12 @@ const client = new WebTorrent({
 })
 
 const app = angular.module('BTorrent',
-  ['ngRoute', 'ui.grid', 'ui.grid.resizeColumns', 'ui.grid.selection', 'ngFileUpload', 'ngNotify'],
-  ['$compileProvider', '$locationProvider', '$routeProvider', function ($compileProvider, $locationProvider, $routeProvider) {
+  ['ngRoute', 'ngFileUpload', 'ngNotify'],
+  ['$compileProvider', '$locationProvider', '$routeProvider', '$rootScopeProvider', function ($compileProvider, $locationProvider, $routeProvider, $rootScopeProvider) {
+    $rootScopeProvider.digestTtl(50)
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|magnet|blob|javascript):/)
     $locationProvider.html5Mode({
-      enabled: true,
+      enabled: false,
       requireBase: false
     }).hashPrefix('#')
     $routeProvider.when('/view', {
@@ -64,6 +65,9 @@ const app = angular.module('BTorrent',
 app.controller('BTorrentCtrl', ['$scope', '$rootScope', '$http', '$log', '$location', 'ngNotify', function ($scope, $rootScope, $http, $log, $location, ngNotify) {
   let updateAll
   $rootScope.version = VERSION
+  $rootScope.goToPath = function (path) {
+    $location.path(path)
+  }
   ngNotify.config({
     duration: 5000,
     html: true
@@ -80,6 +84,15 @@ app.controller('BTorrentCtrl', ['$scope', '$rootScope', '$http', '$log', '$locat
   updateAll = function () {
     if ($rootScope.client.processing) {
       return
+    }
+    // Snapshot these once here rather than binding templates straight to the
+    // live getters below: they wrap a time-based rate calculation that can
+    // return a different value on each of $digest's internal stability-check
+    // passes, which never lets the digest converge ($rootScope:infdig).
+    $rootScope.clientStats = {
+      downloadSpeed: client.downloadSpeed,
+      uploadSpeed: client.uploadSpeed,
+      ratio: client.ratio
     }
     $rootScope.$apply()
   }
@@ -189,74 +202,12 @@ app.controller('FullCtrl', ['$scope', '$rootScope', '$http', '$log', '$location'
     $rootScope.addMagnet($scope.torrentInput)
     $scope.torrentInput = ''
   }
-  $scope.columns = [
-    {
-      field: 'name',
-      cellTooltip: true,
-      minWidth: '200'
-    }, {
-      field: 'length',
-      name: 'Size',
-      cellFilter: 'pbytes',
-      width: '80'
-    }, {
-      field: 'received',
-      displayName: 'Downloaded',
-      cellFilter: 'pbytes',
-      width: '135'
-    }, {
-      field: 'downloadSpeed',
-      displayName: '↓ Speed',
-      cellFilter: 'pbytes:1',
-      width: '100'
-    }, {
-      field: 'progress',
-      displayName: 'Progress',
-      cellFilter: 'progress',
-      width: '100'
-    }, {
-      field: 'timeRemaining',
-      displayName: 'ETA',
-      cellFilter: 'humanTime',
-      width: '140'
-    }, {
-      field: 'uploaded',
-      displayName: 'Uploaded',
-      cellFilter: 'pbytes',
-      width: '125'
-    }, {
-      field: 'uploadSpeed',
-      displayName: '↑ Speed',
-      cellFilter: 'pbytes:1',
-      width: '100'
-    }, {
-      field: 'numPeers',
-      displayName: 'Peers',
-      width: '80'
-    }, {
-      field: 'ratio',
-      cellFilter: 'number:2',
-      width: '80'
+  $scope.selectTorrent = function (torrent) {
+    if (($rootScope.selectedTorrent != null) && ($rootScope.selectedTorrent.infoHash === torrent.infoHash)) {
+      $rootScope.selectedTorrent = null
+    } else {
+      $rootScope.selectedTorrent = torrent
     }
-  ]
-  $scope.gridOptions = {
-    columnDefs: $scope.columns,
-    data: $rootScope.client.torrents,
-    enableColumnResizing: true,
-    enableColumnMenus: false,
-    enableRowSelection: true,
-    enableRowHeaderSelection: false,
-    multiSelect: false
-  }
-  $scope.gridOptions.onRegisterApi = function (gridApi) {
-    $scope.gridApi = gridApi
-    gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-      if (!row.isSelected && ($rootScope.selectedTorrent != null) && ($rootScope.selectedTorrent.infoHash === row.entity.infoHash)) {
-        $rootScope.selectedTorrent = null
-      } else {
-        $rootScope.selectedTorrent = row.entity
-      }
-    })
   }
   if ($location.hash() !== '') {
     $rootScope.client.processing = true
