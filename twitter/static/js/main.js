@@ -693,7 +693,7 @@
         o.a.render(
           n.a.createElement(
             l.a,
-            { basename: "/twitter" },
+            { basename: "/weboasis/twitter" },
             n.a.createElement(U, { feedsStore: V })
           ),
           document.getElementById("root")

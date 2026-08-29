@@ -670,7 +670,7 @@
         o.a.render(
           r.a.createElement(
             c.a,
-            { basename: "/news" },
+            { basename: "/weboasis/news" },
             r.a.createElement(z, { feedsStore: V })
           ),
           document.getElementById("root")
