@@ -6,7 +6,6 @@ function canvasApp() {
 		var canvasElement = document.getElementById('myCanvas');
 		canvasElement.parentNode.removeChild(canvasElement);
 	}
-	var Game_Interval;
 	var winwidth = Math.max(window.screen.width, window.innerWidth);
 	var matrixwidth = winwidth / 10;
 	var nodecimal = Math.round(matrixwidth);
@@ -19,7 +18,7 @@ function canvasApp() {
 		var	t = (n.width = window.innerWidth);
 		var	a = (n.height = window.innerHeight);
 		var	i = Array(nodecimal).join(0).split('');
-		'undefined' != typeof Game_Interval && clearInterval(Game_interval), (Game_Interval = setInterval(o, 42));
+		'undefined' != typeof window.Game_Interval && clearInterval(window.Game_Interval), (window.Game_Interval = setInterval(o, 42));
 	}
 	function o() {
 		(e.fillStyle = 'rgba(0,0,0,.07)'), e.fillRect(0, 0, t, a), (e.fillStyle = color), (e.font = '10px monospace');
