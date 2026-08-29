@@ -33,7 +33,7 @@ VT.TodoDay = function (el) {
   function update(next) {
     Object.assign(state, next);
 
-    var date = new Date(state.dateId);
+    var date = VT.parseDateId(state.dateId);
     var today = new Date();
     today.setHours(0, 0, 0, 0);
     var tomorrow = new Date(today);

@@ -11,7 +11,7 @@ VT.TodoApp = function (el) {
 
   el.innerHTML = [
     '<header class="app-header">',
-    '  <h1 class="title"><a href="/">WebOasis - Todo</a></h1>',
+    '  <h1 class="title"><a href="../">WebOasis - Todo</a></h1>',
     '</header>',
     '<div class="todo-frame -days"></div>',
     '<div class="app-collapsible">',

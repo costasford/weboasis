@@ -268,7 +268,7 @@ VT.AppDraggable = function (el, options) {
   }
 
   function removeDropClassOnce(e) {
-    e.target.removeEventListener(e.type, addDropClassOnce);
+    e.target.removeEventListener(e.type, removeDropClassOnce);
     e.target.classList.remove('-drop');
   }
 

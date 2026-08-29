@@ -110,7 +110,7 @@ VT.TodoFrameDays = function (el) {
     var days = [];
 
     for (var i = 0; i < 2 * RANGE; ++i) {
-      var t = new Date(state.at);
+      var t = VT.parseDateId(state.at);
       t.setDate(t.getDate() - RANGE + i);
       var id = VT.formatDateId(t);
 

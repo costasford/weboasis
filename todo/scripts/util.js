@@ -23,6 +23,14 @@ VT.formatDateId = function (date) {
   );
 };
 
+// Inverse of formatDateId. `new Date("YYYY-MM-DD")` parses as UTC midnight
+// per spec, which reads back as the wrong local day for any timezone west
+// of UTC - construct from the numeric parts instead so it's local midnight.
+VT.parseDateId = function (dateId) {
+  var parts = dateId.split('-');
+  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+};
+
 VT.formatDate = function (date) {
   return (
     VT.formatMonth(date) +
