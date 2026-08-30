@@ -10,7 +10,7 @@
 
 const ALLOWED_ORIGIN = "https://costasford.github.io";
 const SHORT_CODE_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ"; // no 0/O/1/I/l
-const MIN_POST_INTERVAL_SECONDS = 20; // per-IP, per-write-endpoint
+const MIN_POST_INTERVAL_SECONDS = 60; // per-IP, per-write-endpoint (60s is KV's own TTL floor)
 
 function corsHeaders(extra) {
 	return Object.assign(
