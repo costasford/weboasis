@@ -11,9 +11,15 @@
 		<script src="jquery.audioplayer.min.js"></script>
 		<style>
 			/* bg.min.css has a stray `div{max-width:450px}` rule meant for some
-			   other page's decorative boxes; it applies to every div site-wide,
-			   including this one, so it has to be beaten explicitly here. */
+			   other page's decorative boxes; it applies to every div site-wide.
+			   The player plugin builds its own nested divs (.mdtc-clnplra-*)
+			   inside this container, and every one of them inherits that same
+			   450px cap — beating it just on the outer wrapper wasn't enough,
+			   since the actual visible player box is one of those inner divs.
+			   Blanket-override every div under this container instead of
+			   chasing each plugin class individually. */
 			.mediatec-cleanaudioplayer{margin:0 auto;width:95%;max-width:none}
+			.mediatec-cleanaudioplayer div{max-width:none}
 			.logo{padding:15px;margin:0 auto;border:none;width:250px}
 			/* Let station names run their full length instead of "..." truncating —
 			   there's no fixed-height constraint on these list items, so wrapped
