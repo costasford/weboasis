@@ -1,16 +1,24 @@
-// Self-hosted backend for WebOasis's ShortURL and Forum tools.
+// Self-hosted backend for WebOasis's ShortURL, Forum, and Image Host tools.
 // Deploy to Cloudflare Workers (dashboard > Workers & Pages > Create > paste
-// this in) with two bindings added under Settings > Variables:
+// this in) with three bindings added under Settings > Variables:
 //   - KV namespace binding named SHORTLINKS
 //   - D1 database binding named FORUM_DB (run js/site_services_schema.sql
 //     once against it via the D1 console before first use)
+//   - R2 bucket binding named IMAGES
 //
-// One Worker instead of two, since ShortURL and Forum are both small,
-// low-traffic, and this keeps the Cloudflare footprint down.
+// One Worker instead of three separate services, since each of these is
+// small and low-traffic, and this keeps the Cloudflare footprint down.
 
 const ALLOWED_ORIGIN = "https://costasford.github.io";
 const SHORT_CODE_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ"; // no 0/O/1/I/l
 const MIN_POST_INTERVAL_SECONDS = 60; // per-IP, per-write-endpoint (60s is KV's own TTL floor)
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB
+const IMAGE_EXTENSIONS = {
+	"image/jpeg": "jpg",
+	"image/png": "png",
+	"image/gif": "gif",
+	"image/webp": "webp",
+};
 
 function corsHeaders(extra) {
 	return Object.assign(
@@ -167,6 +175,48 @@ async function handleCreateReply(threadId, request, env) {
 	return json({ id: result.meta.last_row_id }, 201);
 }
 
+async function handleUpload(request, env) {
+	var formData;
+	try {
+		formData = await request.formData();
+	} catch (e) {
+		return json({ error: "Expected multipart/form-data with an 'image' field" }, 400);
+	}
+	var file = formData.get("image");
+	if (!file || typeof file.arrayBuffer !== "function") {
+		return json({ error: "No image file provided" }, 400);
+	}
+	var ext = IMAGE_EXTENSIONS[file.type];
+	if (!ext) {
+		return json({ error: "Only JPEG, PNG, GIF, and WebP images are supported" }, 400);
+	}
+	if (file.size > MAX_IMAGE_BYTES) {
+		return json({ error: "Image too large — 8MB max" }, 400);
+	}
+	if (!(await rateLimit(env, request, "upload"))) {
+		return json({ error: "Slow down — try again shortly" }, 429);
+	}
+
+	var key = randomCode(12) + "." + ext;
+	await env.IMAGES.put(key, await file.arrayBuffer(), {
+		httpMetadata: { contentType: file.type },
+	});
+
+	var url = new URL(request.url);
+	return json({ url: url.origin + "/img/" + key }, 201);
+}
+
+async function handleGetImage(key, env) {
+	var object = await env.IMAGES.get(key);
+	if (!object) return new Response("Image not found", { status: 404, headers: corsHeaders() });
+	return new Response(object.body, {
+		headers: corsHeaders({
+			"Content-Type": object.httpMetadata.contentType,
+			"Cache-Control": "public, max-age=31536000, immutable",
+		}),
+	});
+}
+
 export default {
 	async fetch(request, env) {
 		var url = new URL(request.url);
@@ -198,6 +248,14 @@ export default {
 			var replyMatch = path.match(/^\/forum\/threads\/(\d+)\/replies$/);
 			if (replyMatch && request.method === "POST") {
 				return await handleCreateReply(replyMatch[1], request, env);
+			}
+
+			if (path === "/upload" && request.method === "POST") {
+				return await handleUpload(request, env);
+			}
+			var imageMatch = path.match(/^\/img\/([A-Za-z0-9]+\.[a-z]+)$/);
+			if (imageMatch && request.method === "GET") {
+				return await handleGetImage(imageMatch[1], env);
 			}
 
 			return json({ error: "Not found" }, 404);
