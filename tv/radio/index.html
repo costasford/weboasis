@@ -18,7 +18,7 @@
 			   since the actual visible player box is one of those inner divs.
 			   Blanket-override every div under this container instead of
 			   chasing each plugin class individually. */
-			.mediatec-cleanaudioplayer, .radio-toolbar{margin:0 auto;width:95%;max-width:none}
+			.mediatec-cleanaudioplayer, .radio-toolbar, .genre-bar, .radio-resume-bar{margin:0 auto;width:95%;max-width:none}
 			.mediatec-cleanaudioplayer div{max-width:none}
 			.logo{padding:15px;margin:0 auto;border:none;width:250px}
 			/* Let station names run their full length instead of "..." truncating —
@@ -47,16 +47,34 @@
 			}
 			.mdtc-clnplra-playlist-item-fav.active{color:#f5b301}
 			.radio-empty-msg{color:#fff;text-align:center;padding:20px;display:none}
+			.genre-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+			.genre-chip{
+				background:#22252c;border:1px solid #383c45;border-radius:14px;
+				color:#c8c8c8;padding:5px 12px;font-size:12px;font-family:inherit;
+				cursor:pointer;white-space:nowrap;
+			}
+			.genre-chip.active{background:#f5b301;color:#000;border-color:#f5b301}
+			.radio-resume-bar{display:none;margin-bottom:10px}
+			.radio-resume-bar button{
+				width:100%;background:#0b89c3;border:none;border-radius:4px;
+				color:#fff;padding:10px 14px;font-size:14px;font-family:inherit;
+				cursor:pointer;text-align:left;
+			}
+			.radio-resume-bar button:hover{background:#0d9fe0}
 		</style>
 	</head>
 	<body class="background">
 		<div class="logo">
 			<a href="../../"><img src="logo.svg" id="logo" alt="Weboas.is logo" /></a>
 		</div>
+		<div class="radio-resume-bar" id="radio-resume-bar">
+			<button id="radio-resume-btn" type="button"></button>
+		</div>
 		<div class="radio-toolbar">
 			<input type="text" id="station-search" placeholder="Search stations..." autocomplete="off" />
 			<button id="favorites-toggle" type="button">★ Favorites</button>
 		</div>
+		<div class="genre-bar" id="genre-bar"></div>
 		<div class="mediatec-cleanaudioplayer">
 			<ul data-theme="dark" data-disable-controls="true"></ul>
 		</div>

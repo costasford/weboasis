@@ -20,7 +20,7 @@
 		"news", "talk", "comedy",
 	];
 
-	var STATIONS_PER_CATEGORY = 4;
+	var STATIONS_PER_CATEGORY = 8;
 
 	function codecToType(codec) {
 		codec = (codec || "").toUpperCase();
@@ -91,6 +91,22 @@
 		} catch (e) {}
 	}
 
+	var LAST_STATION_KEY = "radioLastStation";
+
+	function saveLastStation(url, title) {
+		try {
+			localStorage.setItem(LAST_STATION_KEY, JSON.stringify({ url: url, title: title }));
+		} catch (e) {}
+	}
+
+	function loadLastStation() {
+		try {
+			return JSON.parse(localStorage.getItem(LAST_STATION_KEY));
+		} catch (e) {
+			return null;
+		}
+	}
+
 	function setupExtras(rows) {
 		var favorites = loadFavorites();
 		var favoritesSet = {};
@@ -140,12 +156,69 @@
 			emptyMsg.style.display = visibleCount === 0 ? "block" : "none";
 		}
 
-		searchInput.addEventListener("input", applyFilter);
+		searchInput.addEventListener("input", function () {
+			clearActiveGenre();
+			applyFilter();
+		});
 		favToggle.addEventListener("click", function () {
 			favoritesOnly = !favoritesOnly;
 			favToggle.classList.toggle("active", favoritesOnly);
 			applyFilter();
 		});
+
+		// Genre quick-jump: one chip per category, reusing the same search
+		// filter under the hood — clicking a chip just fills the search box
+		// with that genre's label.
+		var genreBar = document.getElementById("genre-bar");
+		var genreButtons = [];
+
+		function clearActiveGenre() {
+			genreButtons.forEach(function (btn) { btn.classList.remove("active"); });
+		}
+
+		CATEGORIES.forEach(function (tag) {
+			var label = titleCase(tag);
+			var btn = document.createElement("button");
+			btn.type = "button";
+			btn.className = "genre-chip";
+			btn.textContent = label;
+			btn.addEventListener("click", function () {
+				var alreadyActive = btn.classList.contains("active");
+				clearActiveGenre();
+				searchInput.value = alreadyActive ? "" : label;
+				if (!alreadyActive) btn.classList.add("active");
+				applyFilter();
+			});
+			genreBar.appendChild(btn);
+			genreButtons.push(btn);
+		});
+
+		// Remember whatever station was last actually clicked, so a "Resume"
+		// button can jump back to it on the next visit. Clicking a resume
+		// button synchronously triggers the plugin's own click handler, which
+		// counts as a real user gesture for autoplay purposes.
+		rows.forEach(function (row) {
+			var itemSpan = row.li.querySelector(".mdtc-clnplra-playlist-item");
+			if (!itemSpan) return;
+			itemSpan.addEventListener("click", function () {
+				saveLastStation(row.url, row.title);
+			});
+		});
+
+		var lastStation = loadLastStation();
+		if (lastStation) {
+			var matchingRow = rows.filter(function (r) { return r.url === lastStation.url; })[0];
+			if (matchingRow) {
+				var resumeBar = document.getElementById("radio-resume-bar");
+				var resumeBtn = document.getElementById("radio-resume-btn");
+				resumeBtn.textContent = "▶ Resume: " + lastStation.title;
+				resumeBar.style.display = "block";
+				resumeBtn.addEventListener("click", function () {
+					matchingRow.li.querySelector(".mdtc-clnplra-playlist-item").click();
+					resumeBar.style.display = "none";
+				});
+			}
+		}
 	}
 
 	var listEl = document.querySelector(".mediatec-cleanaudioplayer ul");
