@@ -450,49 +450,111 @@
                 return e.apply(this, arguments);
               };
             })();
+          Object(n.useEffect)(function () {
+            // The effect below can end up firing in a component instance
+            // that isn't the one actually attached to the DOM (observed
+            // live: its own setState calls never produced a re-render,
+            // even in isolation). Subscribing to a page-global event here
+            // instead means whichever instance is really mounted picks up
+            // the data, regardless of which instance did the fetching.
+            u(window.__newsFeedItems ? window.__newsFeedItems.slice() : []);
+            function onUpdate() {
+              u(window.__newsFeedItems.slice());
+            }
+            window.addEventListener("newsFeedDataUpdate", onUpdate);
+            return function () {
+              window.removeEventListener("newsFeedDataUpdate", onUpdate);
+            };
+          }, []);
           Object(n.useEffect)(
             function () {
-              if (!l) {
-                var e = [],
-                  t = "";
-                try {
-                  (e = JSON.parse(localStorage.getItem("newsfeeds"))),
-                    Array.isArray(e) ? a.setFeeds(e) : a.setFeeds(j);
-                } catch (n) {
-                  console.log("error" + n);
-                }
-                try {
-                  (t = JSON.parse(localStorage.getItem("darkmode"))),
-                    a.setDarkMode(t),
-                    console.log(t);
-                } catch (n) {
-                  console.log("error" + n);
-                }
-                a.feeds.map(
-                  (function () {
-                    var e = Object(p.a)(
-                      w.a.mark(function e(t) {
-                        return w.a.wrap(function (e) {
-                          for (;;)
-                            switch ((e.prev = e.next)) {
-                              case 0:
-                                return (e.next = 2), g(t);
-                              case 2:
-                                (h = []), console.log("I am updating");
-                              case 4:
-                              case "end":
-                                return e.stop();
-                            }
-                        }, e);
-                      })
-                    );
-                    return function (t) {
-                      return e.apply(this, arguments);
-                    };
-                  })()
-                );
-              }
+              if (l || window.__newsFeedsFetchStarted) return;
+              window.__newsFeedsFetchStarted = true;
               c(!0);
+              var storedFeeds = [];
+              try {
+                storedFeeds = JSON.parse(localStorage.getItem("newsfeeds"));
+              } catch (err) {}
+              var feedList =
+                Array.isArray(storedFeeds) && storedFeeds.length
+                  ? storedFeeds
+                  : j;
+              a.setFeeds(feedList);
+              try {
+                a.setDarkMode(JSON.parse(localStorage.getItem("darkmode")));
+              } catch (err) {}
+              window.__newsFeedItems = [];
+              var flushTimer = null;
+              function scheduleFlush() {
+                // Batch state updates instead of firing one per feed response
+                // (calling the setter ~100+ times in a burst was tripping
+                // React's excessive-re-render guard and blanking the page).
+                if (flushTimer) return;
+                flushTimer = setTimeout(function () {
+                  flushTimer = null;
+                  window.dispatchEvent(new Event("newsFeedDataUpdate"));
+                }, 400);
+              }
+              Promise.allSettled(
+                feedList.map(function (feed) {
+                  return fetch(
+                    "https://broken-bonus-6b48.costasford.workers.dev/" +
+                      feed.url
+                  )
+                    .then(function (res) {
+                      return res.text();
+                    })
+                    .then(function (xml) {
+                      var doc = new DOMParser().parseFromString(
+                        xml,
+                        "text/xml"
+                      );
+                      var nodes = Array.prototype.slice.call(
+                        doc.querySelectorAll("item")
+                      );
+                      if (!nodes.length)
+                        nodes = Array.prototype.slice.call(
+                          doc.querySelectorAll("entry")
+                        );
+                      var parsed = nodes.map(function (it) {
+                        function txt(tag) {
+                          var n = it.querySelector(tag);
+                          return n ? n.textContent : "";
+                        }
+                        var link = txt("link");
+                        if (!link) {
+                          var linkEl = it.querySelector("link");
+                          link = linkEl
+                            ? linkEl.getAttribute("href") || ""
+                            : "";
+                        }
+                        return {
+                          title: txt("title"),
+                          link: link,
+                          description:
+                            txt("description") ||
+                            txt("summary") ||
+                            txt("content"),
+                          pubDate:
+                            txt("pubDate") ||
+                            txt("published") ||
+                            txt("updated"),
+                          sourceName: feed.name,
+                        };
+                      });
+                      window.__newsFeedItems =
+                        window.__newsFeedItems.concat(parsed);
+                      scheduleFlush();
+                    })
+                    .catch(function () {});
+                })
+              ).then(function () {
+                if (flushTimer) {
+                  clearTimeout(flushTimer);
+                  flushTimer = null;
+                }
+                window.dispatchEvent(new Event("newsFeedDataUpdate"));
+              });
             },
             [l]
           );

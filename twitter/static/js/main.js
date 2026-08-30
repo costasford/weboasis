@@ -432,9 +432,29 @@
                 return e.apply(this, arguments);
               };
             })();
+          Object(r.useEffect)(function () {
+            // The effect below can end up firing in a component instance
+            // that isn't the one actually attached to the DOM. Subscribing
+            // to a page-global event here instead means whichever instance
+            // is really mounted picks up the data, regardless of which
+            // instance did the fetching.
+            u(
+              window.__twitterFeedItems
+                ? window.__twitterFeedItems.slice()
+                : []
+            );
+            function onUpdate() {
+              u(window.__twitterFeedItems.slice());
+            }
+            window.addEventListener("twitterFeedDataUpdate", onUpdate);
+            return function () {
+              window.removeEventListener("twitterFeedDataUpdate", onUpdate);
+            };
+          }, []);
           Object(r.useEffect)(
             function () {
-              if (c) return;
+              if (c || window.__twitterFeedsFetchStarted) return;
+              window.__twitterFeedsFetchStarted = true;
               l(!0);
               var storedFeeds = [];
               try {
@@ -448,13 +468,13 @@
               try {
                 a.setDarkMode(JSON.parse(localStorage.getItem("darkmode")));
               } catch (err) {}
-              var collected = [];
+              window.__twitterFeedItems = [];
               var flushTimer = null;
               function scheduleFlush() {
                 if (flushTimer) return;
                 flushTimer = setTimeout(function () {
                   flushTimer = null;
-                  u(collected.slice());
+                  window.dispatchEvent(new Event("twitterFeedDataUpdate"));
                 }, 400);
               }
               Promise.allSettled(
@@ -504,7 +524,8 @@
                           sourceName: feed.name,
                         };
                       });
-                      collected = collected.concat(parsed);
+                      window.__twitterFeedItems =
+                        window.__twitterFeedItems.concat(parsed);
                       scheduleFlush();
                     })
                     .catch(function () {});
@@ -514,7 +535,7 @@
                   clearTimeout(flushTimer);
                   flushTimer = null;
                 }
-                u(collected.slice());
+                window.dispatchEvent(new Event("twitterFeedDataUpdate"));
               });
             },
             [c]
