@@ -1,7 +1,8 @@
-// Simple placeholder forum: threads + replies stored in this browser's
-// localStorage only (not shared between visitors). Meant to hold the
-// nav slot until a real shared backend is built.
-var STORAGE_KEY = "forum-threads";
+// Forum backed by the shared Cloudflare Worker (js/site_services_worker.js)
+// so threads and replies are visible to every visitor, not just this
+// browser. Posting stays anonymous — just an optional display name, no
+// account.
+var BASE = window.SITE_SERVICES_URL;
 var NAME_KEY = "forum-name";
 var activeThreadId = null;
 
@@ -27,19 +28,6 @@ var els = {
   postReplyBtn: document.getElementById("post-reply-btn"),
 };
 
-function loadThreads() {
-  try {
-    var data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return Array.isArray(data) ? data : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveThreads(threads) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
-}
-
 function getName() {
   return els.nameInput.value.trim() || "Anonymous";
 }
@@ -50,7 +38,8 @@ function escapeHtml(s) {
   return div.innerHTML;
 }
 
-function timeAgo(ts) {
+function timeAgo(sqliteTimestamp) {
+  var ts = new Date(sqliteTimestamp.replace(" ", "T") + "Z").getTime();
   var diff = Date.now() - ts;
   var mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";
@@ -67,82 +56,94 @@ function showView(name) {
   });
 }
 
+function apiRequest(path, options) {
+  return fetch(BASE + path, options)
+    .then(function (res) {
+      return res.json().then(function (data) {
+        if (!res.ok) throw new Error(data.error || "Request failed");
+        return data;
+      });
+    });
+}
+
 function renderList() {
-  var threads = loadThreads().slice().sort(function (a, b) {
-    var aLast = a.replies.length ? a.replies[a.replies.length - 1].createdAt : a.createdAt;
-    var bLast = b.replies.length ? b.replies[b.replies.length - 1].createdAt : b.createdAt;
-    return bLast - aLast;
-  });
-
-  if (!threads.length) {
-    els.threadList.innerHTML = '<div class="empty">No threads yet. Start the first one.</div>';
-    return;
-  }
-
-  els.threadList.innerHTML = threads
-    .map(function (t) {
-      var replyWord = t.replies.length === 1 ? "reply" : "replies";
-      return (
-        '<a class="thread-card" href="#" data-id="' +
-        t.id +
-        '"><h3>' +
-        escapeHtml(t.title) +
-        '</h3><div class="meta">by ' +
-        escapeHtml(t.name) +
-        " · " +
-        timeAgo(t.createdAt) +
-        " · " +
-        t.replies.length +
-        " " +
-        replyWord +
-        "</div></a>"
-      );
+  els.threadList.innerHTML = '<div class="empty">Loading…</div>';
+  apiRequest("/forum/threads")
+    .then(function (data) {
+      var threads = data.threads;
+      if (!threads.length) {
+        els.threadList.innerHTML = '<div class="empty">No threads yet. Start the first one.</div>';
+        return;
+      }
+      els.threadList.innerHTML = threads
+        .map(function (t) {
+          var replyWord = t.reply_count === 1 ? "reply" : "replies";
+          return (
+            '<a class="thread-card" href="#" data-id="' +
+            t.id +
+            '"><h3>' +
+            escapeHtml(t.title) +
+            '</h3><div class="meta">by ' +
+            escapeHtml(t.author_name) +
+            " · " +
+            timeAgo(t.created_at) +
+            " · " +
+            t.reply_count +
+            " " +
+            replyWord +
+            "</div></a>"
+          );
+        })
+        .join("");
     })
-    .join("");
+    .catch(function (err) {
+      els.threadList.innerHTML = '<div class="empty">Couldn’t load threads: ' + escapeHtml(err.message) + "</div>";
+    });
 }
 
 function openThread(id) {
-  var threads = loadThreads();
-  var thread = threads.filter(function (t) {
-    return t.id === id;
-  })[0];
-  if (!thread) {
-    showView("list");
-    renderList();
-    return;
-  }
   activeThreadId = id;
-
-  els.threadContent.innerHTML =
-    '<div class="post"><div class="meta">' +
-    escapeHtml(thread.name) +
-    " · " +
-    timeAgo(thread.createdAt) +
-    '</div><h2 style="margin:0 0 10px;font-size:19px;font-weight:500;">' +
-    escapeHtml(thread.title) +
-    '</h2><div class="body">' +
-    escapeHtml(thread.body) +
-    "</div></div>";
-
-  els.replyCount.textContent =
-    thread.replies.length + (thread.replies.length === 1 ? " reply" : " replies");
-
-  els.replyList.innerHTML = thread.replies
-    .map(function (r) {
-      return (
-        '<div class="post"><div class="meta">' +
-        escapeHtml(r.name) +
-        " · " +
-        timeAgo(r.createdAt) +
-        '</div><div class="body">' +
-        escapeHtml(r.body) +
-        "</div></div>"
-      );
-    })
-    .join("");
-
-  els.replyBody.value = "";
+  els.threadContent.innerHTML = "<div class=\"post\">Loading…</div>";
+  els.replyList.innerHTML = "";
+  els.replyCount.textContent = "";
   showView("thread");
+
+  apiRequest("/forum/threads/" + id)
+    .then(function (data) {
+      var thread = data.thread;
+      els.threadContent.innerHTML =
+        '<div class="post"><div class="meta">' +
+        escapeHtml(thread.author_name) +
+        " · " +
+        timeAgo(thread.created_at) +
+        '</div><h2 style="margin:0 0 10px;font-size:19px;font-weight:500;">' +
+        escapeHtml(thread.title) +
+        '</h2><div class="body">' +
+        escapeHtml(thread.body) +
+        "</div></div>";
+
+      els.replyCount.textContent =
+        data.replies.length + (data.replies.length === 1 ? " reply" : " replies");
+
+      els.replyList.innerHTML = data.replies
+        .map(function (r) {
+          return (
+            '<div class="post"><div class="meta">' +
+            escapeHtml(r.author_name) +
+            " · " +
+            timeAgo(r.created_at) +
+            '</div><div class="body">' +
+            escapeHtml(r.body) +
+            "</div></div>"
+          );
+        })
+        .join("");
+
+      els.replyBody.value = "";
+    })
+    .catch(function (err) {
+      els.threadContent.innerHTML = '<div class="post">Couldn’t load thread: ' + escapeHtml(err.message) + "</div>";
+    });
 }
 
 els.newThreadBtn.addEventListener("click", function () {
@@ -163,21 +164,23 @@ els.postThreadBtn.addEventListener("click", function () {
   var body = els.newBody.value.trim();
   if (!title || !body) return;
 
-  var threads = loadThreads();
-  var thread = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-    title: title,
-    name: getName(),
-    body: body,
-    createdAt: Date.now(),
-    replies: [],
-  };
-  threads.push(thread);
-  saveThreads(threads);
-  if (els.nameInput.value.trim()) localStorage.setItem(NAME_KEY, els.nameInput.value.trim());
-
-  showView("list");
-  renderList();
+  els.postThreadBtn.disabled = true;
+  apiRequest("/forum/threads", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title: title, body: body, author_name: getName() }),
+  })
+    .then(function () {
+      if (els.nameInput.value.trim()) localStorage.setItem(NAME_KEY, els.nameInput.value.trim());
+      showView("list");
+      renderList();
+    })
+    .catch(function (err) {
+      alert("Couldn't post thread: " + err.message);
+    })
+    .then(function () {
+      els.postThreadBtn.disabled = false;
+    });
 });
 
 els.threadList.addEventListener("click", function (e) {
@@ -197,20 +200,22 @@ els.postReplyBtn.addEventListener("click", function () {
   var body = els.replyBody.value.trim();
   if (!body || !activeThreadId) return;
 
-  var threads = loadThreads();
-  var thread = threads.filter(function (t) {
-    return t.id === activeThreadId;
-  })[0];
-  if (!thread) return;
-
-  thread.replies.push({
-    name: getName(),
-    body: body,
-    createdAt: Date.now(),
-  });
-  saveThreads(threads);
-  if (els.nameInput.value.trim()) localStorage.setItem(NAME_KEY, els.nameInput.value.trim());
-  openThread(activeThreadId);
+  els.postReplyBtn.disabled = true;
+  apiRequest("/forum/threads/" + activeThreadId + "/replies", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ body: body, author_name: getName() }),
+  })
+    .then(function () {
+      if (els.nameInput.value.trim()) localStorage.setItem(NAME_KEY, els.nameInput.value.trim());
+      openThread(activeThreadId);
+    })
+    .catch(function (err) {
+      alert("Couldn't post reply: " + err.message);
+    })
+    .then(function () {
+      els.postReplyBtn.disabled = false;
+    });
 });
 
 // restore remembered display name
