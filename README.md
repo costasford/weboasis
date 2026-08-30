@@ -8,7 +8,7 @@
 
 ## What is this?
 
-WebOasis is a customizable start page with a curated icon menu, a live matrix-rain background, and a whole shelf of self-contained tools bolted on underneath it. Instead of a search bar and six bookmarks, you get a search bar, six bookmarks, a stock chart, a WebTorrent client, a 550-question FAQ, and a couple of secret menus you have to find on your own.
+WebOasis is a customizable start page with a curated icon menu, a live matrix-rain background, and a whole shelf of self-contained tools bolted on underneath it. Instead of a search bar and six bookmarks, you get a search bar, six bookmarks, a stock chart, a WebTorrent client, a ~480-question FAQ, and a couple of secret menus you have to find on your own.
 
 No build step, no framework lock-in, no backend to babysit — it's plain HTML/CSS/JS, deployed straight to GitHub Pages.
 
@@ -34,6 +34,10 @@ No build step, no framework lock-in, no backend to babysit — it's plain HTML/C
 | 🖼️ **Editors / Image Host / Upload** | Quick image editing and hosting |
 | 📰 **News / Tech / Twitter** | RSS-fed reading feeds |
 | 🪙 **Crypto** | Live price tracker |
+| 📺 **TV / Radio** | Curated streaming links |
+| 🎬 **Streams** | More streaming links |
+| 🎙️ **Mumble** | Voice chat server info |
+| 🔗 **ShortURL** | Link shortener |
 | 🔳 **QR Generator**, **Unit Converter**, and more | |
 
 ## Running it locally
