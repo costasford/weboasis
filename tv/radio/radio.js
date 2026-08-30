@@ -21,6 +21,7 @@
 	];
 
 	var STATIONS_PER_CATEGORY = 4;
+	var MAX_NAME_LENGTH = 40;
 
 	function codecToType(codec) {
 		codec = (codec || "").toUpperCase();
@@ -31,6 +32,13 @@
 
 	function titleCase(tag) {
 		return tag.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+	}
+
+	function cleanStationName(name, fallbackLabel) {
+		name = (name || "").trim().replace(/\s+/g, " ");
+		if (!name) return fallbackLabel;
+		if (name.length > MAX_NAME_LENGTH) name = name.slice(0, MAX_NAME_LENGTH - 1) + "…";
+		return name;
 	}
 
 	function fetchCategory(host, tag) {
@@ -45,8 +53,10 @@
 					var s = stations[i];
 					var type = codecToType(s.codec);
 					if (!type || !s.url_resolved) continue;
+					var name = cleanStationName(s.name, label + " " + (out.length + 1));
 					out.push({
-						title: out.length === 0 ? label : label + " " + (out.length + 1),
+						title: label + ": " + name,
+						artist: s.countrycode || label,
 						type: type,
 						url: s.url_resolved,
 					});
@@ -85,6 +95,7 @@
 			seen[s.url] = true;
 			var li = document.createElement("li");
 			li.setAttribute("data-title", s.title);
+			li.setAttribute("data-artist", s.artist);
 			li.setAttribute("data-type", s.type);
 			li.setAttribute("data-url", s.url);
 			listEl.appendChild(li);
