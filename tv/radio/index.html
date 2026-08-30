@@ -18,7 +18,7 @@
 			   since the actual visible player box is one of those inner divs.
 			   Blanket-override every div under this container instead of
 			   chasing each plugin class individually. */
-			.mediatec-cleanaudioplayer{margin:0 auto;width:95%;max-width:none}
+			.mediatec-cleanaudioplayer, .radio-toolbar{margin:0 auto;width:95%;max-width:none}
 			.mediatec-cleanaudioplayer div{max-width:none}
 			.logo{padding:15px;margin:0 auto;border:none;width:250px}
 			/* Let station names run their full length instead of "..." truncating —
@@ -30,15 +30,37 @@
 				overflow: visible;
 				text-overflow: clip;
 			}
+			.radio-toolbar{display:flex;gap:10px;margin-bottom:10px}
+			.radio-toolbar input{
+				flex:1;background:#22252c;border:1px solid #383c45;border-radius:4px;
+				color:#e8e8e8;padding:8px 12px;font-size:14px;font-family:inherit;
+			}
+			.radio-toolbar button{
+				background:#22252c;border:1px solid #383c45;border-radius:4px;
+				color:#e8e8e8;padding:8px 14px;font-size:14px;font-family:inherit;
+				cursor:pointer;white-space:nowrap;
+			}
+			.radio-toolbar button.active{background:#f5b301;color:#000;border-color:#f5b301}
+			.mdtc-clnplra-playlist-item-fav{
+				float:right;cursor:pointer;font-size:16px;color:#999;
+				margin-left:10px;line-height:1;padding:2px 4px;
+			}
+			.mdtc-clnplra-playlist-item-fav.active{color:#f5b301}
+			.radio-empty-msg{color:#fff;text-align:center;padding:20px;display:none}
 		</style>
 	</head>
 	<body class="background">
 		<div class="logo">
 			<a href="../../"><img src="logo.svg" id="logo" alt="Weboas.is logo" /></a>
 		</div>
+		<div class="radio-toolbar">
+			<input type="text" id="station-search" placeholder="Search stations..." autocomplete="off" />
+			<button id="favorites-toggle" type="button">★ Favorites</button>
+		</div>
 		<div class="mediatec-cleanaudioplayer">
 			<ul data-theme="dark" data-disable-controls="true"></ul>
 		</div>
+		<p class="radio-empty-msg" id="radio-empty-msg">No stations match your search.</p>
 		<script src="radio.js"></script>
 	</body>
 </html>
