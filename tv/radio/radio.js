@@ -21,7 +21,6 @@
 	];
 
 	var STATIONS_PER_CATEGORY = 4;
-	var MAX_NAME_LENGTH = 40;
 
 	function codecToType(codec) {
 		codec = (codec || "").toUpperCase();
@@ -36,9 +35,7 @@
 
 	function cleanStationName(name, fallbackLabel) {
 		name = (name || "").trim().replace(/\s+/g, " ");
-		if (!name) return fallbackLabel;
-		if (name.length > MAX_NAME_LENGTH) name = name.slice(0, MAX_NAME_LENGTH - 1) + "…";
-		return name;
+		return name || fallbackLabel;
 	}
 
 	function fetchCategory(host, tag) {

@@ -10,8 +10,17 @@
 		<script src="jquery.min.js"></script>
 		<script src="jquery.audioplayer.min.js"></script>
 		<style>
-			.mediatec-cleanaudioplayer{margin:0 auto}
+			.mediatec-cleanaudioplayer{margin:0 auto;max-width:820px}
 			.logo{padding:15px;margin:0 auto;border:none;width:250px}
+			/* Let station names run their full length instead of "..." truncating —
+			   there's no fixed-height constraint on these list items, so wrapped
+			   text just grows the row. */
+			.mdtc-clnplra-main-player .mdtc-clnplra-playlist ul li,
+			.mdtc-clnplra-main-player .mdtc-clnplra-playlist ul li .mdtc-clnplra-playlist-item {
+				white-space: normal;
+				overflow: visible;
+				text-overflow: clip;
+			}
 		</style>
 	</head>
 	<body class="background">
